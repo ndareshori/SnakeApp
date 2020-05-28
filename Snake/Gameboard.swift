@@ -181,6 +181,7 @@ class Gameboard {
         }
     }
     
+    //once the head moves over a board piece, it is added to the activePieces array
     func appendActivePiece(piece: BoardPiece) {
         activePieces.append(piece)
 //        print("appended \(piece.getPos())")
@@ -191,17 +192,17 @@ class Gameboard {
                     let turn = activePieces[i].getBoardPiece()
                     let cd = activePieces[i].getDirection()
                     let ld = activePieces[i - 1].getDirection()
-                    if ld == .south && cd == .east {
+                    if (ld == .south && cd == .east) || (ld == .west && cd == .north) {
                         turn.zRotation = CGFloat.pi
-                    } else if ld == .east && cd == .north {
+                    } else if (ld == .east && cd == .north) || (ld == .south && cd == .west) {
                         turn.zRotation = 3.0 * CGFloat.pi / 2.0
-                    } else if ld == .north && cd == .west {
+                    } else if (ld == .north && cd == .west) || (ld == .east && cd == .south) {
                         turn.zRotation = CGFloat.pi * 2.0
-                    } else if ld == .west && cd == .south {
+                    } else if (ld == .west && cd == .south) || (ld == .north && cd == .east){
                         turn.zRotation = CGFloat.pi / 2.0
                     }
                 } else {
-                    activePieces[i].rotate(pieceInFront: activePieces[i + 1], pieceBehind: activePieces[i - 1] )
+                    activePieces[i].rotate(pieceInFront: activePieces[i + 1], pieceBehind: activePieces[i - 1])
                 }
             }
             i += 1
