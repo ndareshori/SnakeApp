@@ -36,6 +36,7 @@ class GameScene: SKScene {
     private var down = SKSpriteNode(imageNamed: "arrow")
     private var left = SKSpriteNode(imageNamed: "arrow")
     private var right = SKSpriteNode(imageNamed: "arrow")
+    private var keys = [SKSpriteNode]()
     
     private var background: SKSpriteNode?
     
@@ -182,23 +183,30 @@ class GameScene: SKScene {
             up.zRotation = CGFloat.pi / 2.0
             up.zPosition = 1
             addChild(up)
+            keys.append(up)
+            
+            right.position = CGPoint(x: frame.midX + 150, y: frame.minY + 200)
+            right.scale(to: CGSize(width: 175, height: 175))
+            right.name = "right"
+            addChild(right)
+            keys.append(right)
 
             down.position = CGPoint(x: frame.midX, y: frame.minY + 75)
             down.scale(to: CGSize(width: 175, height: 175))
             down.zRotation = 3 * CGFloat.pi / 2.0
             down.name = "down"
             addChild(down)
+            keys.append(down)
 
             left.position = CGPoint(x: frame.midX - 150, y: frame.minY + 200)
             left.scale(to: CGSize(width: 175, height: 175))
             left.zRotation = CGFloat.pi
             left.name = "left"
             addChild(left)
+            keys.append(left)
 
-            right.position = CGPoint(x: frame.midX + 150, y: frame.minY + 200)
-            right.scale(to: CGSize(width: 175, height: 175))
-            right.name = "right"
-            addChild(right)
+            
+
         } else if controls == .swipe {
             
             // Create the gesture recognizer for panning
@@ -244,16 +252,38 @@ class GameScene: SKScene {
             
             let touchPosition = touch.location(in: self)
             let touchNode = self.atPoint(touchPosition)
+            if controls == .keys {
+                print("touchpos: \(touchPosition)")
+                if touchPosition.y < 600 {
+                    let currentDirection = snake.getSnake()[0].getDirection()
+                    let touchResult = findClosestKey(touch: touchPosition)
+                    if touchResult.0 || currentDirection == .none{
+                        if touchResult.1 == up {
+                            changeDirection(direction: .north)
+                        } else if touchResult.1 == right {
+                            changeDirection(direction: .east)
+                        } else if touchResult.1 == down {
+                            changeDirection(direction: .south)
+                        } else if touchResult.1 == left {
+                            changeDirection(direction: .west)
+                        }
+                    } else {
+                        if ((currentDirection == .east || currentDirection == .west) && (touchResult.1 == up || touchResult.2 == up)) {
+                            changeDirection(direction: .north)
+                        } else if ((currentDirection == .north || currentDirection == .south) && (touchResult.1 == right || touchResult.2 == right)) {
+                            changeDirection(direction: .east)
+                        } else if ((currentDirection == .east || currentDirection == .west) && (touchResult.1 == down || touchResult.2 == down)) {
+                            changeDirection(direction: .south)
+                        } else if ((currentDirection == .north || currentDirection == .south) && (touchResult.1 == left || touchResult.2 == left)) {
+                            changeDirection(direction: .west)
+                        }
+                    }
+                }
+            }
+           
             
-            if touchNode == up {
-                changeDirection(direction: .north)
-            } else if touchNode.name == "right" {
-                changeDirection(direction: .east)
-            } else if touchNode.name == "down" {
-                changeDirection(direction: .south)
-            } else if touchNode.name == "left" {
-                changeDirection(direction: .west)
-            } else if touchNode.name == "playAgainButton" {
+//            else
+            if touchNode.name == "playAgainButton" {
                 startNewGame()
             } else if touchNode.name == "mainMenuButton" {
                 MusicPlayer.shared.playSoundEffect(soundType: .button)
@@ -291,6 +321,36 @@ class GameScene: SKScene {
                 stickActive = false
             }
         }
+    }
+        
+    //Uses the pythagorean theorem to determine to closest arrow key to wherever the user touched on the bottom portion of the screen, if the touch position is in the middle of two buttons, it returns both buttons
+    func findClosestKey(touch: CGPoint) -> (Bool, SKSpriteNode, SKSpriteNode) {
+        var closestDistance = CGFloat(99999999999)
+        var secondClosestDistance = CGFloat(9999999999999)
+        var closestKey = up
+        var secondClosestKey = right
+        var isTouchSpecific = true
+        
+        print("")
+        for key in keys {
+            let distanceFromKey = pow(abs(key.position.x - touch.x), 2) + pow(abs(key.position.y - touch.y), 2)
+            print("for key: \(key.name ?? "up") the distance is \(distanceFromKey)")
+            if distanceFromKey < closestDistance {
+                secondClosestKey = closestKey
+                closestKey = key
+                secondClosestDistance = closestDistance
+                closestDistance = distanceFromKey
+            } else if distanceFromKey < secondClosestDistance {
+                secondClosestKey = key
+                secondClosestDistance = distanceFromKey
+            }
+        }
+        print("closest is \(closestKey.name ?? "up"): \(closestDistance)")
+        print("second closest is \(secondClosestKey.name ?? "up"): \(secondClosestDistance)")
+        if abs(closestDistance - secondClosestDistance) < CGFloat(12000) {
+            isTouchSpecific = false
+        }
+        return (isTouchSpecific, closestKey, secondClosestKey)
     }
     
     func changeDirection(direction: Segment.Direction) {
