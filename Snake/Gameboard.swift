@@ -58,48 +58,71 @@ class Gameboard {
     func getWalls() -> [SKSpriteNode] {return walls}
     
     func turnX(pos: CGPoint, currentDirection: Segment.Direction) -> (CGFloat, Bool) {
-        var min = CGFloat(303.0)
+        var min = CGFloat(32.0)
         var closestX = 0
         var turnIsAhead = true
         for j in 0...20 {
             let row = findRowWithY(ypos: pos.y)
             let currentXPos = board[j][0].getX()
-            if (abs(currentXPos - pos.x) < min) {
+            if (abs(currentXPos - pos.x) <= abs(min)) {
                 if !board[j][row].isTurningPoint() {
                     min = abs(currentXPos - pos.x)
                     closestX = j
-                    if (currentDirection == .east && pos.x <= board[j][0].getX()) || (currentDirection == .west && pos.x >= board[j][0].getX()){
+                    if (currentDirection == .east && pos.x <= board[j][0].getX()) || (currentDirection == .west && pos.x >= board[j][0].getX()) {
                         turnIsAhead = true
                     } else {
-                        turnIsAhead = false
+                        if min == CGFloat(32.0){
+                            print("!!!!!!turnX")
+                            if currentDirection == .east {
+                                closestX += 1
+                            } else if currentDirection == .west {
+                                closestX -= 1
+                            }
+                            turnIsAhead = true
+                        } else {
+                            print("min: \(min)")
+                            turnIsAhead = false
+                        }
                     }
                 } else {
-                    print("NOT turning at board[\(j)][\(row)], its already a turn!")
+//                    print("NOT turning at board[\(j)][\(row)], its already a turn!")
                 }
                 
             }
         }
+        
         return (board[closestX][0].getX(), turnIsAhead)
     }
     
     func turnY(pos: CGPoint, currentDirection: Segment.Direction) -> (CGFloat, Bool) {
-        var min = CGFloat(303.0)
+        var min = CGFloat(32.0)
         var closestY = 0
         var turnIsAhead = true
         for j in 0...24 {
             let column = findColumnWithX(xpos: pos.x)
             let currentYPos = board[0][j].getY()
-            if (abs(currentYPos - pos.y) < min) {
+            if (abs(currentYPos - pos.y) <= abs(min)) {
                 if !board[column][j].isTurningPoint() {
                     min = abs(currentYPos - pos.y)
                     closestY = j
                     if (currentDirection == .north && pos.y <= board[0][j].getY()) || (currentDirection == .south && pos.y >= board[0][j].getY()) {
                         turnIsAhead = true
-                        } else {
+                    } else {
+                        if min == CGFloat(32.0) {
+                            print("!!!!!!turnY")
+                            if currentDirection == .north {
+                                closestY += 1
+                            } else if currentDirection == .south{
+                                closestY -= 1
+                            }
+                            turnIsAhead = true
+                        }else {
+                            print("min: \(min)")
                             turnIsAhead = false
                         }
+                    }
                 }else {
-                    print("NOT turning at board[\(column)][\(j)], it's already a turn")
+//                    print("NOT turning at board[\(column)][\(j)], it's already a turn")
                 }
             }
         }
