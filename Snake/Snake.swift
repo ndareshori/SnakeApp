@@ -171,7 +171,9 @@ class Snake {
     
     func moveBeforePause() {
         let direction = snake[0].getDirection()
-        directionBeforePause = direction
+        if direction != .none {
+            directionBeforePause = direction
+        }
         let head = snake[0].getSegment()
         if direction == .east || direction == .west{
             let turnX = Gameboard.shared.turnX(pos: head.position, currentDirection: snake[0].getDirection())
