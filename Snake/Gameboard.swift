@@ -72,20 +72,26 @@ class Gameboard {
                         turnIsAhead = true
                     } else {
                         if min == CGFloat(32.0){
-                            print("!!!!!!turnX")
+//                            print("!!!!!!turnX")
                             if currentDirection == .east {
+//                                if !board[j + 1][row].isTurningPoint() {
+//                                    closestX += 1
+//                                }
                                 closestX += 1
                             } else if currentDirection == .west {
+//                                if !board[j - 1][row].isTurningPoint() {
+//                                    closestX -= 1
+//                                }
                                 closestX -= 1
                             }
                             turnIsAhead = true
                         } else {
-                            print("min: \(min)")
+//                            print("min: \(min)")
                             turnIsAhead = false
                         }
                     }
                 } else {
-//                    print("NOT turning at board[\(j)][\(row)], its already a turn!")
+//                    print("NOT turning at board[j][row], its already a turn!")
                 }
                 
             }
@@ -109,15 +115,21 @@ class Gameboard {
                         turnIsAhead = true
                     } else {
                         if min == CGFloat(32.0) {
-                            print("!!!!!!turnY")
+//                            print("!!!!!!turnY")
                             if currentDirection == .north {
+//                                if !board[column][j + 1].isTurningPoint() {
+//                                    closestY += 1
+//                                }
                                 closestY += 1
                             } else if currentDirection == .south{
+//                                if !board[column][j - 1].isTurningPoint() {
+//                                    closestY -= 1
+//                                }
                                 closestY -= 1
                             }
                             turnIsAhead = true
                         }else {
-                            print("min: \(min)")
+//                            print("min: \(min)")
                             turnIsAhead = false
                         }
                     }

@@ -29,6 +29,8 @@ class Snake {
     var newDirection = Segment.Direction.none
     var newTurnIsAhead = true
     
+    private var copies = SnakeCopies()
+    
     //Need to keep track of what direction the head of the snake was going before the game was paused so that a turning segment isn't placed if the snake goes the same direction it was going before the game was paused
     private var directionBeforePause = Segment.Direction.none
 
@@ -57,7 +59,7 @@ class Snake {
         var i = 0
         while i < numToIncrement {
             let last = snake[snake.count - 1]
-            snake.append(Segment(imageName: "snake_body", pieceDirection: last.getDirection()))
+            snake.append(Segment(imageName: "snake_tail", pieceDirection: last.getDirection()))
             let new = snake[snake.count - 1]
             
             if last.getDirection() == .north {
@@ -74,6 +76,9 @@ class Snake {
             scene.addChild(new.getSegment())
             i += 1
         }
+        updateImages()
+        copies.makeCopy(snake: snake)
+        
     }
     
     func getTail() -> Segment {
@@ -92,35 +97,28 @@ class Snake {
                 if !newTurnIsAhead {
                     distanceToTurn *= -1
                 }
+                var i = 0
                 for seg in snake {
+                    print("seg[\(i)]: \(seg.getSegment().position)")
                     if distanceToTurn != 0 {
+                        print("no")
+                        print("distance: \(distanceToTurn)")
                         seg.movePiece(moveDistance: distanceToTurn)
                         snake[0].setDirection(newDirection: newDirection)
                     } else {
+                        print("where")
                         snake[0].setDirection(newDirection: newDirection)
                         seg.movePiece(moveDistance: moveDistance)
                         
                     }
+                    i += 1
                 }
                 newTurnReady = false
             } else {
                 
             }
-            var i = 1
-            snake[0].rotate()
-            while i < snake.count {
-                
-                snake[i].rotate()
-                
-                if i == snake.count - 1 {
-                    snake[i].changeImage(newImage: 1)
-                    tailPos = i
-                    if i != 1 {
-                        snake[i - 1].changeImage(newImage: 0)
-                    }
-                }
-                i += 1
-            }
+            updateImages()
+            
 //            findTurningPoints()
             
 //             if snake.count > 2 {
@@ -153,6 +151,24 @@ class Snake {
 //                }
 //            }
 //        }
+    }
+    
+    func updateImages() {
+        var i = 1
+        snake[0].rotate()
+        while i < snake.count {
+            
+            snake[i].rotate()
+            
+            if i == snake.count - 1 {
+                snake[i].changeImage(newImage: 1)
+                tailPos = i
+                if i != 1 {
+                    snake[i - 1].changeImage(newImage: 0)
+                }
+            }
+            i += 1
+        }
     }
     
     //Finds the segments where the snake is turning and sends them to the rotateTurningSegment method of the Segment class in order to find which way to rotate them.
@@ -197,9 +213,9 @@ class Snake {
         }
         if !newTurnIsAhead {
             distanceToTurn *= -1
-            print("pause move behind")
+//            print("pause move behind")
         } else {
-            print("pause move ahead")
+//            print("pause move ahead")
         }
         for seg in snake {
             seg.movePiece(moveDistance: distanceToTurn)
@@ -209,10 +225,14 @@ class Snake {
     
     //Empties the snake array and deletes all segments from the game board
     func clearSnake() {
+        print("before")
+        copies.bprint()
         for segment in snake {
             segment.getSegment().removeFromParent()
         }
         snake.removeAll()
+        print("after")
+        copies.bprint()
         Gameboard.shared.hideAllTurningSegments()
         
     }
@@ -241,11 +261,13 @@ class Snake {
                 turningPoint = snake[0].getSegment().position
             }
             else {
+//                print("B4:\(directionBeforePause), new: \(direction)")
                 if directionBeforePause != direction {
                     registerNewTurn(oldDirection: oldDirection, newDirection: direction, turnPosition: head.position)
                     directionBeforePause = .none
                 }
                 snake[0].setDirection(newDirection: direction)
+                print(snake[0].getDirection())
             }
         } else {
             if direction == .north || direction == .south{
@@ -322,6 +344,43 @@ class Snake {
 //
     //Returns the snake array of segment objects
     func getSnake() -> [Segment]{return snake}
+    
+    func makeCopy() {
+        
+    }
+    
+    func showCopies(scene: GameScene) {
+        copies.showCopies(scene: scene)
+    }
+    
+    func moveViews(scene: GameScene, side: Int) {
+        copies.moveViews(scene: scene, side: side)
+    }
+    
+    func resumeWithExtraLife(scene: GameScene) {
+//        let active = copies.getActiveCopy()
+//        for seg in active {
+//            let segment = seg.copy() as! Segment
+//            snake.append(segment)
+//            Gameboard.shared.findPieceAtPoint(point: seg.getSegment().position)?.setDirection(direction: seg.getDirection())
+//            print("direc: \(seg.getDirection())")
+//        }
+        var i = 0
+        while i < copies.getActiveCopyLength() {
+            let copiedSegment = copies.getCopiedSegments()
+            let new = copiedSegment.copy() as! Segment
+            scene.addChild(new.getSegment())
+            snake.append(new)
+            i += 1
+        }
+        print("copied snake to main:")
+        printSnake()
+//        snake[0].setDirection(newDirection: Segment.Direction.none)
+    }
+    
+    func displayCopy() {
+        
+    }
     
     //For debugging
     func printSnake() {

@@ -161,7 +161,7 @@ class MenuViewController: UIViewController, GKGameCenterControllerDelegate {
         settingsPanel.isHidden = false
         exitSettingsButton.isHidden = false
         playClassicButton.isHidden = false
-        if scoreObj.getHighScore() >= 1 {
+        if scoreObj.getHighScore() >= 50 {
             playLevel1Button.isHidden = false
         } else {
             playLevel1Button_Locked.isHidden = false

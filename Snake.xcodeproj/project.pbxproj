@@ -29,6 +29,8 @@
 		9787E8C4243D4E4C0033C67F /* MusicPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9787E8C3243D4E4C0033C67F /* MusicPlayer.swift */; };
 		9787E8CA243D4F9B0033C67F /* eat.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9787E8C6243D4F9B0033C67F /* eat.wav */; };
 		9787E8CD243D4F9B0033C67F /* start.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9787E8C9243D4F9B0033C67F /* start.wav */; };
+		978EDEB924807179004C1163 /* Fireworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978EDEB824807179004C1163 /* Fireworks.swift */; };
+		978EDEFD24808BAF004C1163 /* SnakeCopies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978EDEFC24808BAE004C1163 /* SnakeCopies.swift */; };
 		97AE37F8243DC0A70071B350 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97AE37F7243DC0A70071B350 /* Main.storyboard */; };
 		97D1A38B2442E1890029EF69 /* death.wav in Resources */ = {isa = PBXBuildFile; fileRef = 97D1A38A2442E1890029EF69 /* death.wav */; };
 		97DD1AB32440C0800083C865 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97DD1AB22440C0800083C865 /* GameKit.framework */; };
@@ -60,6 +62,8 @@
 		9787E8C3243D4E4C0033C67F /* MusicPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayer.swift; sourceTree = "<group>"; };
 		9787E8C6243D4F9B0033C67F /* eat.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eat.wav; sourceTree = "<group>"; };
 		9787E8C9243D4F9B0033C67F /* start.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = start.wav; sourceTree = "<group>"; };
+		978EDEB824807179004C1163 /* Fireworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fireworks.swift; sourceTree = "<group>"; };
+		978EDEFC24808BAE004C1163 /* SnakeCopies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnakeCopies.swift; sourceTree = "<group>"; };
 		97AE37F7243DC0A70071B350 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		97D1A38A2442E1890029EF69 /* death.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = death.wav; sourceTree = "<group>"; };
 		97DD1AB22440C0800083C865 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
@@ -118,6 +122,8 @@
 				9743A8252449410500E71C10 /* Game.swift */,
 				971E66C42465D8FF009C55DA /* Gameboard.swift */,
 				971E66C62466FF84009C55DA /* BoardPiece.swift */,
+				978EDEB824807179004C1163 /* Fireworks.swift */,
+				978EDEFC24808BAE004C1163 /* SnakeCopies.swift */,
 			);
 			path = Snake;
 			sourceTree = "<group>";
@@ -228,10 +234,12 @@
 				971E66C72466FF84009C55DA /* BoardPiece.swift in Sources */,
 				974755E4243538C300757044 /* Segment.swift in Sources */,
 				9748C85324411BC500A0B70B /* Vibrations.swift in Sources */,
+				978EDEB924807179004C1163 /* Fireworks.swift in Sources */,
 				9787E8C4243D4E4C0033C67F /* MusicPlayer.swift in Sources */,
 				974755D2243523B700757044 /* GameScene.swift in Sources */,
 				974CFF32243B93270030D619 /* Snake.swift in Sources */,
 				974755E624365C2500757044 /* Food.swift in Sources */,
+				978EDEFD24808BAF004C1163 /* SnakeCopies.swift in Sources */,
 				971E66C52465D8FF009C55DA /* Gameboard.swift in Sources */,
 				974755D4243523B700757044 /* GameViewController.swift in Sources */,
 				974755CC243523B700757044 /* AppDelegate.swift in Sources */,
@@ -372,7 +380,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Snake/Snake!.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = 5ZR3R47M3B;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -384,7 +392,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.4.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = edu.elon.cs.ndareshori.Snake;
 				PRODUCT_NAME = "Snake!";
 				SUPPORTS_MACCATALYST = YES;
@@ -399,7 +407,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Snake/Snake!.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = 5ZR3R47M3B;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -411,7 +419,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.4.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = edu.elon.cs.ndareshori.Snake;
 				PRODUCT_NAME = "Snake!";
 				SUPPORTS_MACCATALYST = YES;

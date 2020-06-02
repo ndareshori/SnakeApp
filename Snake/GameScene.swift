@@ -84,6 +84,14 @@ class GameScene: SKScene {
     private var viewButton : SKSpriteNode?
     private var closeViewButton : SKSpriteNode?
     
+    private var extraLifePanel: SKSpriteNode?
+    private var useExtraLife: SKSpriteNode?
+    private var dontUseExtraLife: SKSpriteNode?
+    
+    private var extraLifeRightButton: SKSpriteNode?
+    private var extraLifeLeftButton: SKSpriteNode?
+    private var extraLifeConfirmButton: SKSpriteNode?
+    
     private var shareButton : SKSpriteNode?
     //Used to handle the game functions, i.e pausing or ending the game
     //Object of the Snake class made up of an array of Segment objects
@@ -95,6 +103,8 @@ class GameScene: SKScene {
     private var food = Food()
     //VC object used to unwind the segue
     var viewController: GameViewController?
+    
+    private var copies = SnakeCopies()
     //Minimum Y value, set to 400 on default but will be changed to 0 if the user is using swipe controls
     private let minY = 400
     private let maxY = 1207
@@ -107,7 +117,7 @@ class GameScene: SKScene {
     private let base = SKSpriteNode(imageNamed: "joystickBase")
     private let ball = SKSpriteNode(imageNamed: "joystickButton")
         
-    
+    private var extraLifeUsed = false
     
     private var vibrate = Vibrations()
     var stickActive = false
@@ -159,6 +169,14 @@ class GameScene: SKScene {
         
         mainMenuButton = self.childNode(withName: "mainMenuButton") as? SKSpriteNode
         mainMenuButton?.name = "mainMenuButton"
+        
+        extraLifePanel = self.childNode(withName: "extraLifePanel") as? SKSpriteNode
+        dontUseExtraLife = self.extraLifePanel?.childNode(withName: "dontUseExtraLife") as? SKSpriteNode
+        useExtraLife = self.extraLifePanel?.childNode(withName: "useExtraLife") as? SKSpriteNode
+        
+        extraLifeLeftButton = self.childNode(withName: "extraLifeLeftButton") as? SKSpriteNode
+        extraLifeRightButton = self.childNode(withName: "extraLifeRightButton") as? SKSpriteNode
+        extraLifeConfirmButton = self.childNode(withName: "extraLifeConfirmButton") as? SKSpriteNode
         
         gameBG = self.childNode(withName: "gameBG") as? SKSpriteNode
 //        arrowBG = self.childNode(withName: "arrowBG") as? SKSpriteNode
@@ -254,7 +272,7 @@ class GameScene: SKScene {
             let touchNode = self.atPoint(touchPosition)
             if controls == .keys {
                 print("touchpos: \(touchPosition)")
-                if touchPosition.y < 600 {
+                if touchPosition.y < 600 && !game.isGamePaused{
                     let currentDirection = snake.getSnake()[0].getDirection()
                     let touchResult = findClosestKey(touch: touchPosition)
                     if touchResult.0 || currentDirection == .none{
@@ -296,7 +314,7 @@ class GameScene: SKScene {
                 resumeGameFromPause()
             } else if touchNode.name == "pauseMenuRestartGameButton" {
                 resumeGameFromPause()
-                gameOver()
+                cancelExtraLife()
                 startNewGame()
             } else if touchNode.name == "pauseMenuExitGameButton" {
                 MusicPlayer.shared.playSoundEffect(soundType: .button)
@@ -314,6 +332,21 @@ class GameScene: SKScene {
                 MusicPlayer.shared.playSoundEffect(soundType: .button)
                 toggleViews()
                 closeViewButton?.isHidden = true
+            } else if touchNode == dontUseExtraLife {
+                cancelExtraLife()
+                MusicPlayer.shared.playSoundEffect(soundType: .button)
+            } else if touchNode == useExtraLife {
+                activateExtraLife()
+                MusicPlayer.shared.playSoundEffect(soundType: .button)
+            } else if touchNode == extraLifeLeftButton {
+                MusicPlayer.shared.playSoundEffect(soundType: .button)
+                snake.moveViews(scene: self, side: 0)
+            } else if touchNode == extraLifeRightButton {
+                MusicPlayer.shared.playSoundEffect(soundType: .button)
+                snake.moveViews(scene: self, side: 1)
+            } else if touchNode == extraLifeConfirmButton {
+                MusicPlayer.shared.playSoundEffect(soundType: .button)
+                resumeWithExtraLife()
             }
             if touchNode == base || touchNode == ball {
                 stickActive = true
@@ -331,10 +364,10 @@ class GameScene: SKScene {
         var secondClosestKey = right
         var isTouchSpecific = true
         
-        print("")
+//        print("")
         for key in keys {
             let distanceFromKey = pow(abs(key.position.x - touch.x), 2) + pow(abs(key.position.y - touch.y), 2)
-            print("for key: \(key.name ?? "up") the distance is \(distanceFromKey)")
+//            print("for key: \(key.name ?? "up") the distance is \(distanceFromKey)")
             if distanceFromKey < closestDistance {
                 secondClosestKey = closestKey
                 closestKey = key
@@ -345,8 +378,8 @@ class GameScene: SKScene {
                 secondClosestDistance = distanceFromKey
             }
         }
-        print("closest is \(closestKey.name ?? "up"): \(closestDistance)")
-        print("second closest is \(secondClosestKey.name ?? "up"): \(secondClosestDistance)")
+//        print("closest is \(closestKey.name ?? "up"): \(closestDistance)")
+//        print("second closest is \(secondClosestKey.name ?? "up"): \(secondClosestDistance)")
         if abs(closestDistance - secondClosestDistance) < CGFloat(12000) {
             isTouchSpecific = false
         }
@@ -387,6 +420,7 @@ class GameScene: SKScene {
 //            }
 //        }
         let lastDirection = getLastDirection()
+        print("LAST DIRECT: \(lastDirection)")
         
         if !game.getPauseStatus() {
             if lastDirection == .north {
@@ -413,6 +447,8 @@ class GameScene: SKScene {
                 if direction != badDirectionAfterPause {
                     snake.smoothTurn(direction: direction)
                     vibrate.vibrate()
+                } else {
+                    print("welp")
                 }
             }
         }
@@ -633,17 +669,65 @@ class GameScene: SKScene {
         pauseButton?.isHidden = true
         image = (view?.snapshot)!
         game.pauseGame()
-        finalScoreLabel?.text = "Score: \(score.getScore())"
+        
+        if !extraLifeUsed {
+            extraLifePanel?.isHidden = false
+            useExtraLife?.isHidden = false
+            dontUseExtraLife?.isHidden = false
+        } else {
+            cancelExtraLife()
+        }
+    }
+    
+    func cancelExtraLife() {
+        let userScore = score.getScore()
+        let userHighscore = score.getHighScore()
+        if userScore > userHighscore {
+//            Fireworks.start(view: self.view!)
+        }
+        finalScoreLabel?.text = "Score: \(userScore)"
         score.calculateHighScore()
         highScoreLabel?.text = "Highscore: \(score.getHighScore())"
         toggleViews()
+        extraLifePanel?.isHidden = true
+        useExtraLife?.isHidden = true
+        dontUseExtraLife?.isHidden = true
+    }
+    
+    func activateExtraLife() {
+        print("swear to god")
+        copies.bprint()
+        snake.showCopies(scene: self)
+        snake.clearSnake()
+        extraLifePanel?.isHidden = true
+        useExtraLife?.isHidden = true
+        dontUseExtraLife?.isHidden = true
+        
+        extraLifeConfirmButton?.isHidden = false
+        extraLifeRightButton?.isHidden = false
+        extraLifeLeftButton?.isHidden = false
+        
+        
+    }
+    
+    func resumeWithExtraLife() {
+        snake.resumeWithExtraLife(scene: self)
+        extraLifeConfirmButton?.isHidden = true
+        extraLifeRightButton?.isHidden = true
+        extraLifeLeftButton?.isHidden = true
+        pauseButton?.isHidden = false
+        game.resumeGameFromPause()
+        let head = snake.getSnake()[0]
+        FindOppositeDirectionBeforePause(directionBeforePause: head.getDirection())
+        head.setDirection(newDirection: .none)
     }
     
     //Starts a new game and resets everything to their default values
     func startNewGame() {
+        snake.clearSnake()
+        copies.clearAll()
         pauseButton?.isHidden = false
         score.resetScore()
-        snake.clearSnake()
         runningScoreLabel?.text = "Score: \(score.getScore())"
         snake.setHead(scene: self)
         tryDropFood()
@@ -682,15 +766,15 @@ class GameScene: SKScene {
     }
     
     
-        //checks to see if two image nodes have collided with eachother, incremented 5 to allow the user more time to turn before a collision regesters
+        //checks to see if two image nodes have collided with eachother, incremented 16 to allow the user more time to turn before a collision regesters
     func isCollided(o1: SKSpriteNode, o2: SKSpriteNode) -> Bool{
-        let width = o1.size.width
+//        let width = o1.size.width
         var collision = false
         
-        if abs(o1.position.x - o2.position.x) < width - 16 &&
-            abs(o1.position.y - o2.position.y) < width - 16{
+//        if abs(o1.position.x - o2.position.x) < width - 16 &&
+//            abs(o1.position.y - o2.position.y) < width - 16{
+        if o1.position.x == o2.position.x && o1.position.y == o2.position.y {
             collision = true
-            
         }
         return collision
     }
